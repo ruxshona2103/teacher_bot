@@ -232,7 +232,14 @@ async def topic_chosen(callback: CallbackQuery, state: FSMContext):
     else:
         await state.update_data(topic_id=int(value), waiting_new_topic_name=False)
         await state.set_state(UploadState.waiting_file)
-        await callback.message.answer("📎 .docx, .pdf yoki .txt fayl yuboring:")
+        await callback.message.answer(
+            "📎 Fayl yuboring:\n\n"
+            "Quyidagi amallardan birini bajaring:\n"
+            "1️⃣ Paperclip (📎) belgisini bosing\n"
+            "2️⃣ Faylni topib tanlang\n"
+            "3️⃣ Yuborish tugmasini bosing\n\n"
+            "Qabul qilinadigan formatlar: .docx · .pdf · .txt"
+        )
 
 
 @router.message(UploadState.waiting_file, F.text)
@@ -243,6 +250,12 @@ async def receive_new_topic_name(message: Message, state: FSMContext):
         return
     data = await state.get_data()
     if not data.get("waiting_new_topic_name"):
+        # Fayl kutilgan paytda matn keldi
+        await message.answer(
+            "⚠️ Matn emas, fayl yuboring!\n\n"
+            "📎 Pastdagi qo'shimcha belgisini bosib "
+            ".docx, .pdf yoki .txt fayl tanlang va yuboring."
+        )
         return
 
     topic_name = message.text.strip()
